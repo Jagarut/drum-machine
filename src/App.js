@@ -1,26 +1,58 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import Display from "./components/Display";
+import DrumPad from "./components/DrumPad";
+import { sounds } from "./data/soundFiles";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  state = { displaySound: "Sound Name" };
+
+  componentDidMount() {
+    document.addEventListener("keydown", (e) => {
+      const id = e.key.toUpperCase();
+      const audio = document.getElementById(id);
+      console.log(id);
+
+      if (audio) {
+        audio.play();
+        this.handleKeyPress(id);
+      }
+    });
+  }
+
+  handleDisplay = (event) => {
+    const soundname = event.target.attributes.getNamedItem("id").value;
+    this.setState({ displaySound: soundname });
+  };
+
+  handleKeyPress(id) {
+    const keys = "q w e a s d z x c".toUpperCase().split(" ");
+    const index = keys.indexOf(id);
+    const soundName = sounds[index].name;
+    this.setState({ displaySound: soundName });
+  }
+
+  render() {
+    return (
+      <div id="drum-machine" className="App ui container">
+        <div className="ui grid">
+          <div className="row centered">
+            <Display display={this.state.displaySound} />
+          </div>
+          <div className=" row centered">
+            {sounds.map((sound) => (
+              <DrumPad
+                key={sound.id}
+                handleDisplay={this.handleDisplay}
+                name={sound.id}
+                soundname={sound.name}
+                url={sound.src}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
 export default App;
